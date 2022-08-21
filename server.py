@@ -1,11 +1,11 @@
 from flask import request, redirect, jsonify, Flask
 from flask_cors import CORS
+import sys
 import requests
 import json
 import os
+from gevent.pywsgi import WSGIServer
 
-import flask.cli
-flask.cli.show_server_banner = lambda *args: None
 
 test = False
 port = 7777 if test else 8080
@@ -30,7 +30,8 @@ def upload():
 
 
 if __name__ == '__main__':
-	app.run(port=port)
-
+	# app.run(port=port)
+	http_server = WSGIServer(('127.0.0.1', port), app)
+	http_server.serve_forever()
 
 
