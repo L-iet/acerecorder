@@ -27,7 +27,7 @@ def upload():
 
 
 if __name__ == '__main__':
-	app.run(port=port,debug=True)
+	app.run(port=port)
 
 
 
