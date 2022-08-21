@@ -4,7 +4,8 @@ import requests
 import json
 import os
 
-port = 7777
+test = False
+port = 7777 if test else 8080
 
 app = Flask(__name__)
 CORS(app)
