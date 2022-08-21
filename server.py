@@ -4,6 +4,9 @@ import requests
 import json
 import os
 
+import flask.cli
+flask.cli.show_server_banner = lambda *args: None
+
 test = False
 port = 7777 if test else 8080
 
