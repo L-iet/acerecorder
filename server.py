@@ -20,7 +20,7 @@ CORS(app, resources={r"/": {"origins": "https://l-iet.github.io"}})
 def upload():
 	print('received post')
 	text_rec = request.json['textRec']
-	# text_rec = json.loads(text_rec_s)
+	print(text_rec[0])
 	if 'auxmedia' in text_rec[0]:
 		# do stuff to get the media
 		print(request.json['media'])
