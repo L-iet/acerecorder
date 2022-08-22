@@ -12,11 +12,11 @@ test = False
 port = 7777 if test else os.environ["PORT"]
 
 app = Flask(__name__)
-app.config['CORS_HEADERS'] = 'Content-Type'
+# app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app, resources={r"/": {"origins": "https://l-iet.github.io"}})
 
 @app.route('/', methods=["POST"])
-@cross_origin(origin="https://l-iet.github.io",headers=['Content-Type'])
+@cross_origin(origin="https://l-iet.github.io")
 def upload():
 	print('received post')
 	text_rec = request.json['textRec']
