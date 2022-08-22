@@ -34,7 +34,7 @@ def upload():
 
 	resp = make_response(jsonify([tvf_url, tvm_url]), 200)
 	resp.headers["Content-Type"] = "application/json"
-	response.headers["Access-Control-Allow-Origin"] = "https://l-iet.github.io"
+	resp.headers["Access-Control-Allow-Origin"] = "https://l-iet.github.io"
 	return resp
 
 
