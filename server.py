@@ -16,7 +16,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app, resources={r"/": {"origins": "https://l-iet.github.io"}})
 
 @app.route('/', methods=["POST"])
-@cross_origin(origin="https://l-iet.github.io",headers=['Content-Type','Authorization'])
+@cross_origin(origin="https://l-iet.github.io",headers=['Content-Type'])
 def upload():
 	print('received post')
 	text_rec = request.json['textRec']
@@ -44,7 +44,7 @@ def upload():
 
 if __name__ == '__main__':
 	# app.run(port=port)
-	http_server = WSGIServer(('', port), app)
+	http_server = WSGIServer(('0.0.0.0', port), app)
 	http_server.serve_forever()
 
 
