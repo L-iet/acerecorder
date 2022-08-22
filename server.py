@@ -23,11 +23,8 @@ def upload():
 	# text_rec = json.loads(text_rec_s)
 	if 'auxmedia' in text_rec[0]:
 		# do stuff to get the media
-		link = request.json['link']
-		print(link)
-		media_data = requests.get(link, allow_redirects=True)
 		with open('media.webm', 'wb+') as media:
-			media.write(media_data.content)
+			media.write(request.json['media'])
 			media.seek(0)
 			tvm_url = googcloud.upload(f"{request.json['filename']}.webm",file_obj=media)
 	else:
