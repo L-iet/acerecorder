@@ -1,5 +1,5 @@
 from flask import request, jsonify, Flask, make_response
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import sys
 import requests
 import json
@@ -12,9 +12,11 @@ test = False
 port = 7777 if test else os.environ["PORT"]
 
 app = Flask(__name__)
-CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+CORS(app, resources={r"/": {"origins": "https://l-iet.github.io"}})
 
 @app.route('/', methods=["POST"])
+@cross_origin(origin="https://l-iet.github.io",headers=['Content-Type','Authorization'])
 def upload():
 	print('received post')
 	text_rec = request.json['textRec']
