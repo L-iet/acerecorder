@@ -23,6 +23,7 @@ def upload():
 	# text_rec = json.loads(text_rec_s)
 	if 'auxmedia' in text_rec[0]:
 		# do stuff to get the media
+		print(request.json['media'])
 		with open('media.webm', 'wb+') as media:
 			media.write(request.json['media'])
 			media.seek(0)
