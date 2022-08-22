@@ -35,7 +35,6 @@ def uploadText():
 @cross_origin(origins="https://l-iet.github.io")
 def uploadMedia():
 	print('receiving media')
-	print(request.data)
 	with open('media.webm', 'wb+') as media: # might consider creating distinct file in case of simultaneous
 		media.write(request.data)
 		media.seek(0)
