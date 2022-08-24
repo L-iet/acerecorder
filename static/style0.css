@@ -1,0 +1,27 @@
+
+.grid {
+	display: grid;
+	grid-template-columns: auto auto auto;
+}
+
+.e-preview {
+	cursor: pointer;
+}
+
+.e-container {
+	position: relative;
+}
+
+.e-container:hover .playbtn {
+	display: block;
+}
+
+.playbtn {
+	position: absolute;
+	margin-top: -20px;
+	top: 40%;
+	left: 50%;
+	display: none;
+	z-index: 100;
+}
+

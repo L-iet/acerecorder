@@ -97,7 +97,7 @@ input:checked + .slider:before {
 .play-btn {
   margin-left: 20%;
   margin-right: 5%;
-  background-image: url('./images/play.png');
+  background-image: url('/static/images/play.png');
   background-size: 40px 40px;
   cursor: pointer;
   opacity: 1;

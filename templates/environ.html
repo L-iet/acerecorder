@@ -9,7 +9,7 @@
         <script type="text/javascript" src="{{url_for('static',filename='./ace-builds/src-min-noconflict/ext-settings_menu.js')}}"></script>
         <script type="text/javascript" src="{{url_for('static',filename='./ace-builds/src-min-noconflict/ext-statusbar.js')}}"></script>
         <script type="text/javascript" src="{{url_for('static',filename='./ace-builds/src-min-noconflict/ext-keybinding_menu.js')}}"></script>
-        <link rel="stylesheet" type="text/css" href="./style.css">
+        <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='./style.css')}}"/>
         <script type="text/javascript" src="{{url_for('static',filename='./jszip.min.js')}}"></script>
         <script type="text/javascript" src="{{url_for('static',filename='./FileSaver.js')}}"></script>
     </head>
@@ -51,9 +51,9 @@
                 <div id="play-btn" class="play-btn rowblock hide-when-rec"></div>
                 <button class="downl-btn hide-when-rec" onclick="downloadRecording()">Download</button>
                 <button class="hide-when-rec" id="upload-public" style="display:none;" onclick="uploadPublic()">Upload publicly</button>
-                <div id="mic" style="display:none;"><img src="./images/microphone.png" width="40" height="40"></div>
+                <div id="mic" style="display:none;"><img src="{{url_for('static',filename='./images/microphone.png')}}" width="40" height="40"></div>
             </div>
         </div>
-        <script type="text/javascript" src="app.js"></script>
+        <script type="text/javascript" src="{{url_for('static',filename='app.js')}}"></script>
     </body>
 </html>

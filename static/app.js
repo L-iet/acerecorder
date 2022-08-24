@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    ace.config.set('basePath', './static/ace-builds/src-min-noconflict');
+    ace.config.set('basePath', '/static/ace-builds/src-min-noconflict');
 
     var editor = ace.edit("editor");
 
@@ -14,7 +14,7 @@ $(document).ready(function(){
 
     //TODO: Handle user deny media access
 
-    var keystrokes = [];
+    var keystrokes = []; //will not define keystrokes from here, so I can use it on main page
     var terminalOuts = [];
     var playbackEvents = [];
     var terminalEvents = [];
@@ -87,7 +87,7 @@ $(document).ready(function(){
     function togglePlayPause (e) {
         if ( (event.type === 'click') ) { // || (event.type === 'keypress' && event.key === ' ' && !isRecording)
             isPlaying = !isPlaying;
-            playBtn.style.backgroundImage = isPlaying ? "url('./images/pause.png')" : "url('./images/play.png')";
+            playBtn.style.backgroundImage = isPlaying ? "url('/static/images/pause.png')" : "url('/static/images/play.png')";
             if (isPlaying) {
                 document.getElementById("recordmenu").style.display = "none";
                 play();
@@ -103,7 +103,7 @@ $(document).ready(function(){
     }
 
     playBtn.addEventListener('click', togglePlayPause);
-    document.addEventListener('keypress', togglePlayPause)
+    //document.addEventListener('keypress', togglePlayPause)
 
     function startRecordingMedia() {
 
@@ -492,12 +492,12 @@ $(document).ready(function(){
     function downloadTextRecording() {
         var time = Date.now();
         var fileName = time+'.tvf';
-        download(keystrokes, fileName, 'text/plain');
+        download({'filename':fileName,'code':keystrokes,'terminal':terminalOuts}, fileName, 'text/plain');
     }
     function downloadMediaRecording() {
         var zip = new JSZip();
         var time = Date.now();
-        zip.file(time+'.tvf', JSON.stringify(keystrokes));
+        zip.file(time+'.tvf', JSON.stringify({'filename':fileName,'code':keystrokes,'terminal':terminalOuts}));
 
         zip.file( time+'.webm' , mediaBlob);
         zip.generateAsync({type:"blob"})
@@ -530,7 +530,7 @@ $(document).ready(function(){
         // xhr.send(  JSON.stringify({'filename':Date.now(), 'textRec':keystrokes, 'media': mediaBlob}) );
         let fileName = Date.now();
 
-        fetch(url, {method: "POST", body: JSON.stringify({'filename':fileName, 'textRec':keystrokes}), headers: {'Content-Type': 'application/json'}}
+        fetch(url, {method: "POST", body: JSON.stringify({'filename':fileName, 'code':keystrokes,'terminal':terminalOuts}), headers: {'Content-Type': 'application/json'}}
             ).then(response => response.json().then(data=>console.log(data))
             ).catch(error => console.log(error));
 

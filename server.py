@@ -14,6 +14,7 @@ import zipfile
 import tarfile
 import re
 import subprocess
+import requests
 
 
 test = True
@@ -30,9 +31,29 @@ CORS(app)
 
 @app.route('/')
 def index():
-	return render_template('index.html',videos=[{'text':{'code':'[{"alltext": "hey there\\nfellas"}]','terminal':'{"alltext":"yo wassup"}'},'medialink':''}, 
-		{'text':{'code':'[{"alltext": "text 2 here"}]','terminal':'{"alltext":r"term 2 here"}'},'medialink':''}],
-		json=json)
+	ks = json.loads(requests.get('https://storage.googleapis.com/litstorage/1661357713866.tvf').text)['code']
+	return render_template('index.html',videos=[{'text':{'code':'[{"alltext": "print(\'hi\')\\n\\tprint(\'no\')"}]','terminal':'{"alltext":"yo wassup"}'},'medialink':''}, 
+		{'text':{'code':'[{"alltext": "with open(\'filename\') as f:\\n\\tfor i in range(5):\\n\\t\\tprint(f.read())"}]','terminal':'{"alltext":r"term 2 here"}'},'medialink':''},
+		{'text':{'code':'[{"alltext": "text 3 here"}]','terminal':'{"alltext":r"term 2 here"}'},'medialink':''},
+		{'text':{'code':'[{"alltext": "text 4 here"}]','terminal':'{"alltext":r"term 2 here"}'},'medialink':''}],
+		json=json,_keystrokes=ks,slimax=ks[-1]['timestamp'])
+
+
+@app.route('/environ/<fname>')
+def environ(fname):
+	print(fname)
+	if fname == 'new':
+		print('yay')
+		return render_template('environ.html',keystrokes=[],terminalOuts=[],media_url='')
+	else:
+		print('no')
+		base_url = "https://storage.googleapis.com/litstorage/"
+		text = requests.get(f"{base_url}{fname}.tvf").text
+		_dict = json.loads(text)
+		media_url = f"{base_url}{fname}.webm" if _dict['code'][0].get('auxmedia') in ['audio','video'] else ''
+		return render_template('environ.html',keystrokes=_dict['code'], terminalOuts=_dict['terminal'], media_url=media_url)
+
+
 
 @app.route('/text', methods=["POST"])
 def uploadText():
@@ -40,7 +61,7 @@ def uploadText():
 	text_rec = request.json["textRec"]
 	print(text_rec[0])
 	
-	tvf_url = googcloud.upload(f"{request.json['filename']}.tvf",file_str=json.dumps(text_rec))
+	tvf_url = googcloud.upload(f"{request.json['filename']}.tvf",file_str=json.dumps(request.json))
 
 	resp = make_response({"publicUrl":tvf_url}, 200)
 	resp.headers["Content-Type"] = "application/json"

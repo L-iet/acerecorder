@@ -10,25 +10,38 @@
     <script type="text/javascript" src="{{url_for('static',filename='./ace-builds/src-min-noconflict/ext-settings_menu.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='./ace-builds/src-min-noconflict/ext-statusbar.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='./ace-builds/src-min-noconflict/ext-keybinding_menu.js')}}"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/github-dark.min.css">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='./style0.css')}}"/>
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='./style.css')}}"/>
 	<title>Ace Code Recorder</title>
 </head>
 <body>
-	<div class="edit">
-		<div class="editor" id="editor" style="height: 460px;"></div>
+	<script>var keystrokes = {{_keystrokes|safe}}</script>
+	<p>Ace Recorder is a recorder built with the <a href="https://ace.c9.io/">Ace</a> code editor.</p>
+	<p>Record coding sessions, download, upload and replay them as often as you want.</p>
+	<p>Recordings are interactive, so you can directly copy code from the 'video'. You can even pause and edit the code to run it in real-time!</p>
+	<div class="edit" style="margin: 50px;">
+		<div class="editor" id="editor-main" style="height: 460px;"></div>
+		<div class="slidecontainer hide-when-rec" style="width:100%;">
+            <input type="range" style="width:100%;" min="0" max="{{slimax}}" value="0" class="timeline" id="myRange">
+        </div>
+        <div id="play-btn" class="play-btn rowblock hide-when-rec"></div>
 	</div>
 	<div class="grid">
 		<!--videos is a list of dictionaries: {'text':{'code':'','terminal':''},'media_link':''}
 			code and terminal are json strings representing the recordings.
 		-->
 		{% for vid in videos %}
-		<div class="vid-preview">
-			<div class="e-preview">
-				{{ json.loads(vid['text']['code'])[-1]['alltext'] }}
+			<div class="e-container">
+			<pre class="e-preview"><code class="language-python">{{ json.loads(vid['text']['code'])[-1]['alltext'] }}
+				</code>
+			</pre>
+			<div class="playbtn"><img src="./static/images/play-icon-white.jpg" width="40" height="40" /></div>
 			</div>
-		</div>
 		{% endfor %}
 	</div>
-
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+	<script>hljs.highlightAll();</script>
 	<script type="text/javascript" src="{{url_for('static',filename='main.js')}}"></script>
 </body>
 </html>
