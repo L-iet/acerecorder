@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script type="text/javascript" src="{{url_for('static',filename='./ace-builds/src-min-noconflict/ace.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='./ace-builds/src-min-noconflict/ext-language_tools.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='./ace-builds/src-min-noconflict/ext-settings_menu.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='./ace-builds/src-min-noconflict/ext-statusbar.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='./ace-builds/src-min-noconflict/ext-keybinding_menu.js')}}"></script>
+	<title>Ace Code Recorder</title>
+</head>
+<body>
+	<div class="edit">
+		<div class="editor" id="editor" style="height: 460px;"></div>
+	</div>
+	<div class="grid">
+		<!--videos is a list of dictionaries: {'text':{'code':'','terminal':''},'media_link':''}
+			code and terminal are json strings representing the recordings.
+		-->
+		{% for vid in videos %}
+		<div class="vid-preview">
+			<div class="e-preview">
+				{{ json.loads(vid['text']['code'])[-1]['alltext'] }}
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+
+	<script type="text/javascript" src="{{url_for('static',filename='main.js')}}"></script>
+</body>
+</html>

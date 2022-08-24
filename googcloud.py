@@ -3,7 +3,7 @@ import os
 import json
 from google.oauth2 import service_account
 
-test = False
+test = True
 if test:
     with open(os.environ['JSON_FILE']) as f:
         credentials_dict = json.load(f)

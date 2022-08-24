@@ -1,4 +1,4 @@
-from flask import request, Flask, make_response
+from flask import request, Flask, make_response, render_template
 from flask_cors import CORS
 import sys
 import json
@@ -16,7 +16,7 @@ import re
 import subprocess
 
 
-test = False
+test = True
 port = 7777 if test else os.environ["PORT"]
 
 _origin_url = "*" if test else "https://l-iet.github.io"
@@ -24,10 +24,17 @@ _origin_url = "*" if test else "https://l-iet.github.io"
 _origins = {"origins":_origin_url}
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 # app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app)
 
-@app.route('/', methods=["POST"])
+@app.route('/')
+def index():
+	return render_template('index.html',videos=[{'text':{'code':'[{"alltext": "hey there\\nfellas"}]','terminal':'{"alltext":"yo wassup"}'},'medialink':''}, 
+		{'text':{'code':'[{"alltext": "text 2 here"}]','terminal':'{"alltext":r"term 2 here"}'},'medialink':''}],
+		json=json)
+
+@app.route('/text', methods=["POST"])
 def uploadText():
 	print(request.headers)
 	text_rec = request.json["textRec"]
@@ -76,6 +83,7 @@ def execute(c,o,e):
 	os.makedirs = _f(os.makedirs)
 	os.mkdir = _f(os.mkdir)
 	os.rmdir = _f(os.rmdir)
+	os.getenv = _f(os.getenv)
 	shutil.copy2 = _f(shutil.copy2)
 	shutil.copy = _f(shutil.copy)
 	shutil.copytree = _f(shutil.copytree)
