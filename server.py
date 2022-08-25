@@ -48,7 +48,7 @@ def index():
 		last_text = {"lastcode":rec_text['code'][-2]['data']['alltext'],"filename":filename}
 		vids.append(last_text)
 
-	return render_template('index.html',videos=vids,filename="1661357713866")
+	return render_template('index.html',videos=vids,filename="1661464969745")
 
 
 @app.route('/environ/<fname>')
