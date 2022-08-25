@@ -10,6 +10,7 @@
 		This was built using the <a href="https://ace.c9.io/">Ace</a> code editor.
 		Link to my github repository of the project is <a href="https://github.com/L-iet/acerecorder">here.</a>
 	</p>
+	<p>This little project was partly inspired by <a href="https://asciinema.org">Asciinema</a>, a really cool site to record and share terminal sessions. </p>
 	<p>Made with Python/Flask, HTML, CSS and Javascript.</p>
 	<p>Recordings are interactive so you can view the recording, pause it to copy or modify code and continue watching. You can also run some Python code, though some functions cannot be run.</p>
 	<p>For instance, the <code>input</code> function doesn't currently work here.</p>
@@ -20,7 +21,7 @@
 	<p>To record, simply click on the <b>Record</b> toggle. Then type on the editor. To stop recording, click on the toggle again.</p>
 	<p>Audio and video (camera) can also be recorded. Select the radio button corresponding to the appropriate media.</p>
 	<p>Once you stop recording, you can view the recording. At that point, it is not publicly available. To upload publicly, click on the <b>Upload Publicly</b> button.</p>
-	<p>Each time you click the <b>Record</b> toggle, the previous recording is erased from memory.</p>
+	<p>Each time you click the <b>Record</b> toggle, the previous recording is erased from local memory.</p>
 
 	<span><button onclick="window.location.href='{{url_for('environ',fname='new')}}'">Start Recording</button></span>
 	<span><button style="margin-left: 200px;" onclick="window.location.href='/'">Back to home</button></span>
