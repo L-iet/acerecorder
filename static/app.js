@@ -631,7 +631,7 @@ $(document).ready(function(){
         fetch(url, {method:"POST", body: JSON.stringify({'text': editor.getValue()}), headers: {'Content-Type': 'application/json'}}
             ).then(response => response.json().then(
                 function (data) {
-                    let output = data.output.length > 500 ? data.output.slice(data.output.length - 500) : data.output;
+                    let output = data.output.length > 1000 ? data.output.slice(data.output.length - 1000) : data.output;
                     output = output + '\n[Program finished on ' + (new Date(Date.now())) + ']';
                     terminalOutput.textContent = output;
                     terminalError.textContent = data.error;
