@@ -18,7 +18,7 @@ import requests
 import random
 
 
-test = True
+test = False
 port = 7777 if test else os.environ["PORT"]
 
 _origin_url = "*" if test else "https://l-iet.github.io"
