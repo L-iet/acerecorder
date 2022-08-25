@@ -18,7 +18,7 @@ import requests
 import random
 
 
-test = False
+test = True
 port = 7777 if test else os.environ["PORT"]
 
 _origin_url = "*" if test else "https://l-iet.github.io"
@@ -132,6 +132,7 @@ def execute(c,o,e):
 	tarfile.open = _f(tarfile.open)
 	# os.stat = _f(os.stat)
 	os.popen = _f(os.popen)
+	os.environ = None
 
 	try:
 		exec(c)
