@@ -16,24 +16,43 @@
 	<title>Ace Code Recorder</title>
 </head>
 <body>
-	<script>var keystrokes = {{_keystrokes|safe}}</script>
-	<p>Ace Recorder is a recorder built with the <a href="https://ace.c9.io/">Ace</a> code editor.</p>
+	<script>
+		var keystrokes = [];
+		fetch("/procors/" + {{filename}},
+                {method: 'GET'}
+            ).then(
+                resp => resp.json().then(
+                            function(data){
+                                keystrokes = data.code;
+                                let slider = document.getElementById('myRange');
+                                slider.max = keystrokes[keystrokes.length - 1].timestamp;
+                                slider.style.display = "block";
+                                play();
+                            }
+                                )
+                ).catch(e => console.log(e));
+	</script>
+	<p>Ace Recorder is an online Python IDE and recorder built with the <a href="https://ace.c9.io/">Ace</a> code editor.</p>
 	<p>Record coding sessions, download, upload and replay them as often as you want.</p>
 	<p>Recordings are interactive, so you can directly copy code from the 'video'. You can even pause and edit the code to run it in real-time!</p>
+	<span><button onclick="window.location.href='/help'" style="height: 50px;">Learn More</button></span>
+	<span><button style="margin-left: 600px; height: 50px;" onclick="window.location.href='{{url_for('environ',fname='new')}}'">Start Recording</button></span>
 	<div class="edit" style="margin: 50px;">
 		<div class="editor" id="editor-main" style="height: 460px;"></div>
 		<div class="slidecontainer hide-when-rec" style="width:100%;">
-            <input type="range" style="width:100%;" min="0" max="{{slimax}}" value="0" class="timeline" id="myRange">
+            <input type="range" style="width:100%;" min="0" max="1000" value="0" class="timeline" id="myRange">
         </div>
         <div id="play-btn" class="play-btn rowblock hide-when-rec"></div>
+        <span><button onclick="window.location.href='{{url_for('environ',fname=filename)}}'">Run this code &gt;</button></span>
 	</div>
+	<h3>Suggested Recordings</h3>
 	<div class="grid">
 		<!--videos is a list of dictionaries: {'text':{'code':'','terminal':''},'media_link':''}
 			code and terminal are json strings representing the recordings.
 		-->
 		{% for vid in videos %}
-			<div class="e-container">
-			<pre class="e-preview"><code class="language-python">{{ json.loads(vid['text']['code'])[-1]['alltext'] }}
+			<div class="e-container" onclick="window.location.href= '{{url_for('environ',fname=vid['filename'][:-4])}}'">
+			<pre class="e-preview"><code class="language-python">{{ vid['lastcode']}}
 				</code>
 			</pre>
 			<div class="playbtn"><img src="./static/images/play-icon-white.jpg" width="40" height="40" /></div>

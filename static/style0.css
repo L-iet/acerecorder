@@ -1,11 +1,19 @@
 
 .grid {
 	display: grid;
-	grid-template-columns: auto auto auto;
+	grid-template-columns: 24% 24% 24% 24%;
+	grid-template-rows: 300px;
+	grid-column-gap: 4px;
+	grid-row-gap: 50px;
 }
 
 .e-preview {
 	cursor: pointer;
+	height: 100%;
+}
+
+.hljs {
+	height: 100%;
 }
 
 .e-container {

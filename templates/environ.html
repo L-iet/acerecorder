@@ -14,11 +14,31 @@
         <script type="text/javascript" src="{{url_for('static',filename='./FileSaver.js')}}"></script>
     </head>
     <body>
+        <script>
+            var keystrokes = []; var terminalOuts = [];
+        </script>
+        {% if filename != 'new' %}
+        <script>
+            fetch("/procors/" + {{filename}},
+                {method: 'GET'}
+            ).then(
+                resp => resp.json().then(
+                            function(data){
+                                keystrokes = data.code; terminalOuts = data.terminal;
+                                let slider = document.getElementById('myRange');
+                                slider.max = keystrokes[keystrokes.length - 1].timestamp;
+                                slider.style.display = "block";
+                            }
+                                )
+                ).catch(e => console.log(e));
+        </script>
+        {% endif %}
+        <script>var mediaUrl = "{{media_url}}", auxmedia="{{auxmedia}}";</script>
         <div class="container-fluid">
             <div class="row">
                 <div class="editor" id="editor" style="height:478px;"></div>
-                <div id = "recordmenu" class="rowblock">
-                    <div id="mediaTypes" class="hide-when-rec hide-when-play">
+                <div id = "recordmenu" class="rowblock hide-when-play">
+                    <div id="mediaTypes" class="hide-when-rec">
                         <input type="radio" id="r-video" name="rec_media" value="video">
                         <label for="html">Text and Audio/Video</label><br>
                         <input type="radio" id="r-audio" name="rec_media" value="audio">
@@ -33,27 +53,57 @@
                     </label><br>
                     <label id="recording-text" for="rec">Record</label>
                 </div>
-                <div id="video-feed" class="video-feed" style="display:none; max-width: 150px; aspect-ratio:4/3">
+                <div id="video-feed" class="video-feed" style="max-width: 150px; aspect-ratio:4/3">
                     <video autoplay id="web-cam-container" 
-                        style="background-color: black; max-width: 150px;">
+                        style="background-color: black; max-width: 150px; display: none;">
                         Your browser doesn't support 
                         the video tag
                     </video>
-                    <video id="preview" src=""></video>
+                    <video id="preview" style="max-width: 150px;" src=""></video>
                     <audio id="prev-aud" src=""></audio>
                 </div>
-                <button id="runCode" class="runCode hide-when-play" onclick="runCode()">Run code|></button>
+                <button id="runCode" class="runCode" onclick="runCode()">Run code|></button>
                 <div id="term" style="background-color: black; font-size: 10px;"><textarea readonly id="out" style="color: white;resize: none; height:50%; width:100%; background-color:black;"></textarea><textarea readonly id="err" style="color: red;resize: none;height: 50%;width:100%;background-color:black;"></textarea></div>
                 <div class="slidecontainer hide-when-rec" style="width:100%;">
                     <input type="range" style="width:100%;display:none;" min="0" max="3600000" value="0" class="timeline" id="myRange">
                 </div>
-                <button class="reset-btn hide-when-rec" onclick="">Reset</button><br>
+                <button class="reset-btn hide-when-rec hide-when-play" onclick="reset()">Reset</button><br>
                 <div id="play-btn" class="play-btn rowblock hide-when-rec"></div>
-                <button class="downl-btn hide-when-rec" onclick="downloadRecording()">Download</button>
-                <button class="hide-when-rec" id="upload-public" style="display:none;" onclick="uploadPublic()">Upload publicly</button>
+                <button class="downl-btn hide-when-rec hide-when-play" onclick="downloadRecording()">Download</button>
+                <button class="hide-when-rec hide-when-play" id="upload-public" style="display:none;" onclick="confirmUpload()">Upload publicly</button>
+                <button id="back-home" onclick="window.location.href='/'">Back to home</button>
                 <div id="mic" style="display:none;"><img src="{{url_for('static',filename='./images/microphone.png')}}" width="40" height="40"></div>
             </div>
         </div>
         <script type="text/javascript" src="{{url_for('static',filename='app.js')}}"></script>
+        <div id="overlay"></div>
+        <div id="popup-succ" class="popup">
+            <div class="popupcontrols">
+                <span id="popupclose-succ" class="popupclose">X</span>
+            </div>
+            <div class="popupcontent">
+                <h1>Successfully uploaded</h1>
+                <p>View the uploaded <a href="" id="succ-link">recording here.</a></p>
+                <button onclick="window.location.href='/'">Back to home</button>
+            </div>
+        </div>
+        <div id="popup-fail" class="popup">
+            <div class="popupcontrols">
+                <span id="popupclose-fail"class="popupclose">X</span>
+            </div>
+            <div class="popupcontent">
+                <h1>An error occurred.</h1>
+            </div>
+        </div>
+        <div id="popup-confirm" class="popup">
+            <div class="popupcontrols">
+                <span id="popupclose-conf" class="popupclose">X</span>
+            </div>
+            <div class="popupcontent">
+                <h1>Do you want to upload publicly?</h1>
+                <p>Recordings will be viewable by anyone and cannot be deleted.</p>
+                <button onclick="uploadPublic()">Upload</button>
+            </div>
+        </div>
     </body>
 </html>

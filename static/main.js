@@ -95,7 +95,7 @@ $(document).ready(function(){
 
     function play() {
         moveSlider = true;
-        console.log(keystrokes[1]);
+        console.log(slider.max);
         if (startind === 0 && startTime === 0) {
             editor.setValue("");
             slider.value = 0;
@@ -178,7 +178,5 @@ $(document).ready(function(){
         playbackEvents.push(evt);
 
     }
-
-    play();
 
 });

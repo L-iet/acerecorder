@@ -14,8 +14,28 @@ $(document).ready(function(){
 
     //TODO: Handle user deny media access
 
-    var keystrokes = []; //will not define keystrokes from here, so I can use it on main page
-    var terminalOuts = [];
+    var closePopupConf = document.getElementById("popupclose-conf");
+    var closePopupSucc = document.getElementById("popupclose-succ");
+    var closePopupFail = document.getElementById("popupclose-fail");
+    var overlay = document.getElementById("overlay");
+    var popupConfirm = document.getElementById("popup-confirm");
+    var popupSucc = document.getElementById("popup-succ");
+    var popupFail = document.getElementById("popup-fail");
+    var button = document.getElementById("button");
+
+    var closePs = [closePopupConf, closePopupSucc, closePopupFail];
+    var pops = [popupConfirm, popupSucc, popupFail]
+    
+    for (var i = 0; i < closePs.length; i++) {
+        closePs[i].onclick = function() {
+          overlay.style.display = 'none';
+          (this.id === "popupclose-conf"? popupConfirm : (this.id === "popupclose-succ" ?popupSucc : popupFail)).style.display = "none";
+        }; 
+    }
+
+
+    //var keystrokes = []; //will not define keystrokes from here, so I can use it on main page
+    //var terminalOuts = [];
     var playbackEvents = [];
     var terminalEvents = [];
     var curTimestamp = 0; //will hold the current timestamp of the video when a recording exists
@@ -40,12 +60,15 @@ $(document).ready(function(){
     }
 
     var hideWhenRecording = document.getElementsByClassName('hide-when-rec');
+    var hideWhenPlaying = document.getElementsByClassName('hide-when-play');
     var terminalOutput = document.getElementById("out");
     var terminalError = document.getElementById("err");
 
     var startTime = 0;
     var startind = 0;
+    var tstartind = 0;
     var isRecording = false;
+    var hasRecordedOnce = false;
     var isPlaying = false;
     const playBtn = document.getElementById('play-btn');
     var radios = document.getElementsByName('rec_media');
@@ -53,6 +76,14 @@ $(document).ready(function(){
     var currentMediaType = 'text';
     var mediaChunks = [];
     var mediaBlob;
+
+    if (mediaUrl !== '') {
+        var _type = auxmedia;
+        currentMediaType = auxmedia;
+        var recMedia = _type === "audio" ? document.getElementById('prev-aud') : document.getElementById('preview');
+        if (_type === "video") document.getElementById('preview').style.display = "block";
+        recMedia.src = mediaUrl;
+    }
 
     const audioMediaConstraints = {
         audio: true,
@@ -70,15 +101,15 @@ $(document).ready(function(){
         radios[i].addEventListener('change', function() {
             if(this.checked) mediaToRecord = this.value;
             if (this.value === "video") {
-                document.getElementById("video-feed").style.display = "block";
+                webCamContainer.style.display = "block";
                 document.getElementById("mic").style.display = "none";
             }
             else if (this.value === "audio") {
                 document.getElementById("mic").style.display = "block";
-                document.getElementById("web-cam-container").style.display = "none";
+                webCamContainer.style.display = "none";
             }
             else {
-                document.getElementById("video-feed").style.display = "none";
+                webCamContainer.style.display = "none";
                 document.getElementById("mic").style.display = "none";
             }
         });
@@ -89,7 +120,7 @@ $(document).ready(function(){
             isPlaying = !isPlaying;
             playBtn.style.backgroundImage = isPlaying ? "url('/static/images/pause.png')" : "url('/static/images/play.png')";
             if (isPlaying) {
-                document.getElementById("recordmenu").style.display = "none";
+                //TODO
                 play();
             }
             else {
@@ -254,6 +285,7 @@ $(document).ready(function(){
             }
             keystrokes.push({'data': {'action': 'idle'}, 'timestamp':Date.now()-keystrokes[0].starttimestamp}); //previously only added the idle end for audio/video recording, now for all
             stop();
+            hasRecordedOnce = true;
         }
         else {
             document.getElementById("preview").src = "";
@@ -275,6 +307,10 @@ $(document).ready(function(){
 
 
     function pause() {
+
+        for (let i=0; i<hideWhenPlaying.length; i++) hideWhenPlaying[i].style.display = "block";
+        document.getElementById('upload-public').style.display = hasRecordedOnce ? 'block' : 'none';
+        document.getElementById('runCode').disabled = false;
 
         if (currentMediaType === "video" || currentMediaType === "audio") {
             let prevVid = document.getElementById(  currentMediaType === "video" ? 'preview' : 'prev-aud');
@@ -363,7 +399,8 @@ $(document).ready(function(){
         moveSlider = true;
         //setStartTimeandIndex();
 
-        //console.log(playbackEvents);
+        for (let i=0; i<hideWhenPlaying.length; i++) hideWhenPlaying[i].style.display = "none";
+        document.getElementById('runCode').disabled = true;
         if (startind === 0 && startTime === 0) {
             editor.setValue("");
             let tind = tstartind===0?0:tstartind-1;
@@ -402,9 +439,11 @@ $(document).ready(function(){
                     curTimestamp = 0;
                     startind = 0; startTime = 0;
                     tstartind = 0;
-                    document.getElementById("recordmenu").style.display = "block";
+                    for (let i=0; i<hideWhenPlaying.length; i++) hideWhenPlaying[i].style.display = "block";
+                    document.getElementById('upload-public').style.display = hasRecordedOnce ? 'block' : 'none';
+                    document.getElementById('runCode').disabled = false;
                 }
-                playBtn.style.backgroundImage = "url(./images/play.png)";
+                playBtn.style.backgroundImage = "url(/static/images/play.png)";
                 isPlaying = false;
             }
         }, 10)
@@ -476,8 +515,16 @@ $(document).ready(function(){
 
     function createTermEvent(starttime, i) {
         var t = terminalOuts[i], dT=1;
-        var evt = setTimeout( function(){terminalOutput.textContent = t.out; terminalError.textContent=t.err;} ,
+        var evt = setTimeout( function(){
+            terminalOutput.textContent = t.out;
+            terminalError.textContent=t.err;
+            if (t.type) {
+                let runBtn = document.getElementById('runCode');
+                runBtn.style.backgroundColor = "#FFD580";
+            }
+        } ,
                 dT * ((terminalOuts[i].timestamp - starttime) - terminalOuts[0].timeoffset) );
+        if (t.type) setTimeout(function(){document.getElementById('runCode').style.backgroundColor = "buttonface";}, dT * ((terminalOuts[i].timestamp - starttime) - terminalOuts[0].timeoffset) + 500);
         terminalEvents.push(evt);
     }
 
@@ -507,10 +554,14 @@ $(document).ready(function(){
         });
     }
     function downloadRecording () {
-        if (currentMediaType === "text") downloadTextRecording();
-        else downloadMediaRecording();
-        //tvf file is just text recording
-        //tvm file is text and media, in this case keystrokes[0] has a auxmedia key whose value is video or audio
+        console.log(keystrokes);
+        if (keystrokes.length > 0){
+
+            if (currentMediaType === "text") downloadTextRecording();
+            else downloadMediaRecording();
+            //tvf file is just text recording
+            //tvm file is text and media, in this case keystrokes[0] has a auxmedia key whose value is video or audio
+        } else alert('No recording available.');
     }
     window.downloadRecording = downloadRecording;
 
@@ -518,12 +569,35 @@ $(document).ready(function(){
         stop();
         keystrokes = [];
         playbackEvents = [];
+        terminalEvents = [];
+        terminalOuts = [];
+        location.href = "/environ/new";
     }
     window.reset = reset;
 
+    function confirmUpload() {
+        overlay.style.display = 'block';
+        popupConfirm.style.display = 'block';
+    }
+    window.confirmUpload = confirmUpload;
+
+    function alertPopup(message) {
+        overlay.style.display = 'block';
+        if (message.type === 's') {
+            popupSucc.style.display = 'block';
+            document.getElementById('succ-link').href = message.url;
+        }
+        else if (message.type === 'f') popupFail.style.display = 'block';
+    }
+
     function uploadPublic() {
         // const xhr = new XMLHttpRequest();
-        const url= "https://fathomless-stream-52797.herokuapp.com/";
+
+        overlay.style.display = 'none';
+        popupConfirm.style.display = 'none';
+        console.log('closed this');
+
+        const url= "/text";
         // xhr.open("POST", url, true);
         // xhr.setRequestHeader('Content-Type', 'application/json');
         var recordedMedia = currentMediaType === "video" ? document.getElementById("preview") : document.getElementById("prev-aud");
@@ -531,13 +605,18 @@ $(document).ready(function(){
         let fileName = Date.now();
 
         fetch(url, {method: "POST", body: JSON.stringify({'filename':fileName, 'code':keystrokes,'terminal':terminalOuts}), headers: {'Content-Type': 'application/json'}}
-            ).then(response => response.json().then(data=>console.log(data))
-            ).catch(error => console.log(error));
+            ).then(function(response) {
+                        if (currentMediaType === 'text') {
+                            if (response.ok) alertPopup({type: 's', url: new URL(`./${fileName}`, document.baseURI).href });
+                            else alertPopup({type: 'f'});
+                        }
+                    }
+            ).catch(function(error) {console.log(error);alertPopup({type:'f'});});
 
         if (currentMediaType !== "text")
-            fetch(`${url}media/${fileName}`, {method: "POST", body: mediaBlob}
-            ).then(response => response.json().then(data=>console.log(data))
-            ).catch(error => console.log(error));
+            fetch(`/media/${fileName}`, {method: "POST", body: mediaBlob}
+            ).then(response => (response.ok ? alertPopup({type: 's', url: new URL(`./${fileName}`, document.baseURI).href }) : null)
+            ).catch(function(error) {console.log(error);alertPopup({type:'f'});});
 
 
         // xhr.onreadystatechange = (e) => {
@@ -547,12 +626,13 @@ $(document).ready(function(){
     window.uploadPublic = uploadPublic;
 
     function runCode() {
-        const url= "https://fathomless-stream-52797.herokuapp.com/runCode";
+        if (isRecording) terminalOuts.push({'out':'','err':'','type':'runClicked','timestamp':Date.now() - terminalOuts[0].starttimestamp});
+        const url= "/runCode";
         fetch(url, {method:"POST", body: JSON.stringify({'text': editor.getValue()}), headers: {'Content-Type': 'application/json'}}
             ).then(response => response.json().then(
                 function (data) {
                     let output = data.output.length > 500 ? data.output.slice(data.output.length - 500) : data.output;
-                    output = output + '\n[Program finished]';
+                    output = output + '\n[Program finished on ' + (new Date(Date.now())) + ']';
                     terminalOutput.textContent = output;
                     terminalError.textContent = data.error;
                     if (isRecording) {

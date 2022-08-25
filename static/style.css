@@ -87,7 +87,7 @@ input:checked + .slider:before {
     'edit  edit  edit  edit  edit  edit  edit  term    term    term '
     'timel timel timel timel timel timel timel space   space   space '
     'play  play  downl downl t     reset reset space   space   space '
-    's1    s1    s1    upl   upl   s2    s3    space   space   space ';
+    'upl   upl   s1    s1    s2    s2    s3    space   space   space ';
     grid-template-rows: 120px 30px 62px 62px 62px 62px 62px 20px 40px 40px;
 
   column-gap: 20px;
@@ -132,3 +132,43 @@ input:checked + .slider:before {
   font-family: system-ui;
 }
 
+#back-home {
+  grid-area: s1;
+}
+
+/*for popup*/
+
+#overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: #999;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+  z-index: 100;
+}
+
+.popup {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: #fff;
+  width: 500px;
+  height: 500px;
+  margin-left: -250px; /*Half the value of width to center div*/
+  margin-top: -250px; /*Half the value of height to center div*/
+  z-index: 200;
+}
+
+.popupclose {
+  float: right;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.popupcontent {
+  padding: 10px;
+}

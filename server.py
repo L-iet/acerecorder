@@ -15,9 +15,10 @@ import tarfile
 import re
 import subprocess
 import requests
+import random
 
 
-test = True
+test = False
 port = 7777 if test else os.environ["PORT"]
 
 _origin_url = "*" if test else "https://l-iet.github.io"
@@ -31,35 +32,47 @@ CORS(app)
 
 @app.route('/')
 def index():
-	ks = json.loads(requests.get('https://storage.googleapis.com/litstorage/1661357713866.tvf').text)['code']
-	return render_template('index.html',videos=[{'text':{'code':'[{"alltext": "print(\'hi\')\\n\\tprint(\'no\')"}]','terminal':'{"alltext":"yo wassup"}'},'medialink':''}, 
-		{'text':{'code':'[{"alltext": "with open(\'filename\') as f:\\n\\tfor i in range(5):\\n\\t\\tprint(f.read())"}]','terminal':'{"alltext":r"term 2 here"}'},'medialink':''},
-		{'text':{'code':'[{"alltext": "text 3 here"}]','terminal':'{"alltext":r"term 2 here"}'},'medialink':''},
-		{'text':{'code':'[{"alltext": "text 4 here"}]','terminal':'{"alltext":r"term 2 here"}'},'medialink':''}],
-		json=json,_keystrokes=ks,slimax=ks[-1]['timestamp'])
+	base_url = "https://storage.googleapis.com/litstorage/"
+	# ks = json.loads(requests.get(f'{base_url}1661357713866.tvf').text)['code']
+	files = []
+	af = googcloud.get_all_files()
+	random.shuffle(af)
+	for x in af:
+		if x.endswith('.tvf'):
+			files.append(x)
+		if len(files) == 4:
+			break
+	vids = []
+	for filename in files:
+		rec_text = json.loads(requests.get(f'{base_url}{filename}').text)
+		last_text = {"lastcode":rec_text['code'][-2]['data']['alltext'],"filename":filename}
+		vids.append(last_text)
+
+	return render_template('index.html',videos=vids,filename="1661357713866")
 
 
 @app.route('/environ/<fname>')
 def environ(fname):
-	print(fname)
 	if fname == 'new':
-		print('yay')
-		return render_template('environ.html',keystrokes=[],terminalOuts=[],media_url='')
+		return render_template('environ.html',filename=fname,media_url='', auxmedia='')
 	else:
-		print('no')
 		base_url = "https://storage.googleapis.com/litstorage/"
 		text = requests.get(f"{base_url}{fname}.tvf").text
 		_dict = json.loads(text)
-		media_url = f"{base_url}{fname}.webm" if _dict['code'][0].get('auxmedia') in ['audio','video'] else ''
-		return render_template('environ.html',keystrokes=_dict['code'], terminalOuts=_dict['terminal'], media_url=media_url)
+		auxmedia = _dict['code'][0].get('auxmedia', '')
+		media_url = f"{base_url}{fname}.webm" if auxmedia in ['audio','video'] else ''
+		return render_template('environ.html',filename=fname, media_url=media_url, auxmedia=auxmedia)
 
+@app.route('/procors/<fname>')
+def procors(fname):
+	resp = requests.get(f"https://storage.googleapis.com/litstorage/{fname}.tvf").json()
+	return make_response(resp, 200)
 
 
 @app.route('/text', methods=["POST"])
 def uploadText():
-	print(request.headers)
-	text_rec = request.json["textRec"]
-	print(text_rec[0])
+	text_rec = request.json
+	print(text_rec['code'][0])
 	
 	tvf_url = googcloud.upload(f"{request.json['filename']}.tvf",file_str=json.dumps(request.json))
 
@@ -70,7 +83,6 @@ def uploadText():
 
 @app.route('/media/<filename>', methods=["POST"])
 def uploadMedia(filename):
-	print('receiving media')
 	tvm_url = googcloud.upload(f"{filename}.webm", file_str=request.data, content_type="video/webm")
 	resp = make_response({"publicUrl":tvm_url}, 200)
 	resp.headers["Content-Type"] = "application/json"
@@ -83,6 +95,7 @@ def execute(c,o,e):
 
 	def _print(*args, **kwargs):
 		print(*args, **kwargs,flush=True)
+	globals()['_print'] = _print
 
 	def _f(func):
 		def f2(*args, **kwargs):
@@ -119,7 +132,6 @@ def execute(c,o,e):
 	tarfile.open = _f(tarfile.open)
 	# os.stat = _f(os.stat)
 	os.popen = _f(os.popen)
-
 
 	try:
 		exec(c)
@@ -169,6 +181,10 @@ def run():
 	resp.headers["Content-Type"] = "application/json"
 	resp.headers["Access-Control-Allow-Origin"] = _origin_url
 	return resp
+
+@app.route('/help')
+def help():
+	return render_template('help.html')
 
 
 if __name__ == '__main__':
